@@ -3,9 +3,9 @@ from sampling import sampling, sampling_xor
 import pandas as pd
 import numpy as np
 
-def jaccard(fileA, fileB, k, s):
+def jaccard_xor(fileA, fileB, k, s):
     """ Computes the jaccard index between each file using
-    similar sampled kmers as unit.
+    similar sampled xorshifted kmers as unit.
     :param Array fileA: the list of sequences in file A
     :param Array fileB: the list of sequences in file B
     :param int k: the length of a kmer
@@ -17,13 +17,13 @@ def jaccard(fileA, fileB, k, s):
     dicoA = {}
     lenA = 0
     lenB = 0
-    for kmer in sampling(fileA, k, s):
+    for kmer in sampling_xor(fileA, k, s):
       lenA += 1
       if kmer not in dicoA:
         dicoA[kmer] = 1
       else:
         dicoA[kmer] += 1
-    for kmer in sampling(fileB, k, s):
+    for kmer in sampling_xor(fileB, k, s):
       lenB += 1
       if kmer in dicoA:
         Intersection += 1
@@ -33,6 +33,7 @@ def jaccard(fileA, fileB, k, s):
     Union = lenB + lenA - Intersection
     j = Intersection/Union
     return j
+
 
 if __name__ == "__main__":
     # Load all the files in a dictionary
@@ -44,9 +45,9 @@ if __name__ == "__main__":
     matrix = np.ones((len(filenames), len(filenames)))
     for i in range(len(files)):
         for j in range(i+1, len(files)):
-            jaccard_dist = jaccard(files[filenames[i]], files[filenames[j]], k, s)
+            jaccard_dist = jaccard_xor(files[filenames[i]], files[filenames[j]], k, s)
             print(filenames[i], filenames[j], jaccard_dist)
             matrix[i,j] = jaccard_dist
             matrix[j,i] = jaccard_dist
     matrix_df = pd.DataFrame(matrix, columns=filenames, index=filenames)
-    matrix_df.to_csv(f'distance_matrix_{s}.csv')
+    matrix_df.to_csv(f'distance_matrix_xor_{s}.csv')
